@@ -1,0 +1,82 @@
+x-env: &env
+  env_file: .env.docker
+  environment:
+    EDITOR: vim
+    HISTFILE: /usr/local/hist/.bash_history
+  stdin_open: true
+  tty: true
+  volumes: history:/usr/local/hist
+x-backend: &backend
+  <<: *env
+  volumes:
+    - .bashrc:/root/.bashrc:ro
+x-frontend: &frontend
+  <<: *env
+  volumes:
+    - .bashrc:/root/.bashrc:ro
+  environment: &frontend_environment
+
+services:
+  mysql:
+    <<: *env
+    image: mysql
+    build:
+      context: ./persistence/mysql
+    volumes:
+      - mysql:/var/lib/mysql
+      - ./persistence/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 5s
+      retries: 10
+    networks:
+      playground_network:
+
+  postgres:
+    <<: *env
+    image: postgres
+    build:
+      context: ./persistence/postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./persistence/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: pg_isready -U playground -h 127.0.0.1 -d playground
+      interval: 5s
+      retries: 10
+    networks:
+      playground_network:
+
+  redis:
+    <<: *env
+    image: redis
+    build:
+      context: ./persistence/redis
+      args:
+        REDIS_VERSION: 7.0.15-alpine
+    volumes:
+      - redis:/data
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      playground_network:
+
+networks:
+  playground_network:
+    name: playground_network
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+volumes:
+  mysql:
+  postgres:
+  redis:
