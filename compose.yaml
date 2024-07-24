@@ -19,6 +19,25 @@ x-frontend: &frontend
     - .bashrc:/root/.bashrc:ro
 
 services:
+  go:
+    <<: *backend
+    build:
+      context: ./app/go
+      args:
+        GO_VERSION: 1.22.5
+    volumes:
+      - ./persistence/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    restart: on-failure
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    networks:
+      - playground_network
+
   mysql:
     <<: *env
     build:
