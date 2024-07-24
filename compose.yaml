@@ -1,5 +1,7 @@
 x-env: &env
-  env_file: .env.docker
+  env_file:
+    - .env.common
+    - .env.docker
   environment:
     EDITOR: vim
     HISTFILE: /usr/local/hist/.bash_history
