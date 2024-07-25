@@ -8,8 +8,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/testcontainers/testcontainers-go"
-	mysqlContainers "github.com/testcontainers/testcontainers-go/modules/mysql"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,17 +20,18 @@ import (
 )
 
 const (
-	UseTestContainers = true
+	useTestContainers = true
+	reuseContainer    = false
 )
 
 func NewTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
 
-	if UseTestContainers {
+	if useTestContainers {
 		return initTestContainers(t)
 	}
 
-	return initTestDB(t)
+	return initActualDB(t)
 }
 
 func initTestContainers(t *testing.T) *gorm.DB {
@@ -40,34 +42,46 @@ func initTestContainers(t *testing.T) *gorm.DB {
 		t.Fatal("PACKAGE_ROOT environment variable not set")
 	}
 	cfg := config.DB()
-	if packageRoot == "" {
-		panic("PACKAGE_ROOT environment variable not set")
-	}
-	container, err := mysqlContainers.Run(ctx,
-		"mysql:8.0.36",
-		mysqlContainers.WithScripts(filepath.Join(packageRoot, "db", "schema.sql")),
-		mysqlContainers.WithDatabase(cfg.Name),
-		mysqlContainers.WithUsername(cfg.User),
-		mysqlContainers.WithPassword(cfg.Password),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("port: 3306  MySQL Community Server - GPL").
-				WithStartupTimeout(20*time.Second)),
-	)
+	ctn, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: testcontainers.ContainerRequest{
+			Name:         t.Name(),
+			Image:        "mysql:8.0.36",
+			ExposedPorts: []string{"3306/tcp"},
+			Env: map[string]string{
+				"MYSQL_ROOT_PASSWORD": "root",
+				"MYSQL_USER":          cfg.User,
+				"MYSQL_PASSWORD":      cfg.Password,
+				"MYSQL_DATABASE":      cfg.Name,
+			},
+			HostConfigModifier: func(hostConfig *container.HostConfig) {
+				hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
+					Type:        mount.TypeBind,
+					Source:      filepath.Join(packageRoot, "db", "schema.sql"),
+					Target:      "/docker-entrypoint-initdb.d/init.sql",
+					ReadOnly:    true,
+					BindOptions: nil,
+				})
+			},
+			WaitingFor: wait.ForLog("port: 3306  MySQL Community Server - GPL").WithStartupTimeout(10 * time.Second),
+		},
+		Started: true,
+		Reuse:   reuseContainer,
+	})
 	if err != nil {
 		t.Fatalf("Could not start mysql: %s", err)
 	}
 
-	host, err := container.Host(ctx)
+	host, err := ctn.Host(ctx)
 	if err != nil {
 		t.Fatalf("Could not get host: %s", err)
 	}
-	port, err := container.MappedPort(ctx, "3306")
+	port, err := ctn.MappedPort(ctx, "3306")
 	if err != nil {
 		t.Fatalf("Could not get port %s: %s", "3306", err)
 	}
 
 	t.Cleanup(func() {
-		if err := container.Terminate(ctx); err != nil {
+		if err := ctn.Terminate(ctx); err != nil {
 			t.Fatalf("Could not stop mysql: %s", err)
 		}
 	})
@@ -83,7 +97,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 	return db
 }
 
-func initTestDB(t *testing.T) *gorm.DB {
+func initActualDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(config.DB().DatabaseURL()), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Warn),
 	})
