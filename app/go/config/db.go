@@ -27,5 +27,5 @@ func DB() DBConfig {
 }
 
 func (config DBConfig) DatabaseURL() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", config.User, config.Password, config.Host, config.Port, config.Name)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local", config.User, config.Password, config.Host, config.Port, config.Name)
 }

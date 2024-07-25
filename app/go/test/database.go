@@ -51,7 +51,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 		mysqlContainers.WithPassword(cfg.Password),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("port: 3306  MySQL Community Server - GPL").
-				WithStartupTimeout(10*time.Second)),
+				WithStartupTimeout(20*time.Second)),
 	)
 	if err != nil {
 		t.Fatalf("Could not start mysql: %s", err)
@@ -72,7 +72,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 		}
 	})
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", cfg.User, cfg.Password, host, port.Int(), cfg.Name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local", cfg.User, cfg.Password, host, port.Int(), cfg.Name)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})

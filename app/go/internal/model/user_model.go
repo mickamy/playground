@@ -12,7 +12,7 @@ var (
 )
 
 type User struct {
-	ID        BinaryUUID `gorm:"primary_key;type:binary(16);default:UUID_TO_BIN(UUID())"`
+	ID        UUID `gorm:"primary_key;type:binary(16);default:UUID_TO_BIN(UUID())"`
 	Slug      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -20,6 +20,6 @@ type User struct {
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	id, err := uuid.NewRandom()
-	u.ID = BinaryUUID(id)
+	u.ID = UUID(id)
 	return err
 }
