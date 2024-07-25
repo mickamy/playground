@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brianvoe/gofakeit/v7"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/google/uuid"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/mysql"
@@ -45,7 +45,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 	cfg := config.DB()
 	ctn, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
-			Name:         gofakeit.UUID(),
+			Name:         uuid.NewString(),
 			Image:        "mysql:8.0.36",
 			ExposedPorts: []string{"3306/tcp"},
 			Env: map[string]string{
@@ -63,7 +63,8 @@ func initTestContainers(t *testing.T) *gorm.DB {
 					BindOptions: nil,
 				})
 			},
-			WaitingFor: wait.ForLog("port: 3306  MySQL Community Server - GPL").WithStartupTimeout(10 * time.Second),
+			WaitingFor: wait.ForLog("port: 3306  MySQL Community Server - GPL").
+				WithStartupTimeout(15 * time.Second),
 		},
 		Started: true,
 		Reuse:   reuseContainer,
