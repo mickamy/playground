@@ -7,11 +7,11 @@ import (
 )
 
 type DBConfig struct {
-	User string `env:"DB_USER"`
-	Pass string `env:"DB_PASS"`
-	Host string `env:"DB_HOST"`
-	Port int    `env:"DB_PORT"`
-	Name string `env:"DB_NAME"`
+	User     string `env:"DB_USER" envDefault:"playground"`
+	Password string `env:"DB_PASSWORD" envDefault:"password"`
+	Host     string `env:"DB_HOST" envDefault:"localhost"`
+	Port     int    `env:"DB_PORT" envDefault:"3306"`
+	Name     string `env:"DB_NAME" envDefault:"playground"`
 }
 
 var db = DBConfig{}
@@ -27,5 +27,5 @@ func DB() DBConfig {
 }
 
 func (config DBConfig) DatabaseURL() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", config.User, config.Pass, config.Host, config.Port, config.Name)
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", config.User, config.Password, config.Host, config.Port, config.Name)
 }
