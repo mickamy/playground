@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
+	_ "mickamy.com/playground/internal/lib/logger"
+
+	"mickamy.com/playground/internal/api"
 )
 
 func main() {
-	fmt.Println("Hello World!")
+	api.Run()
 }

@@ -8,7 +8,6 @@ type APIConfig struct {
 	Port         int    `env:"PORT" envDefault:"3000"`
 	BackendHost  string `env:"BACKEND_HOST"`
 	FrontendHost string `env:"FRONTEND_HOST"`
-	CookieDomain string `env:"COOKIE_DOMAIN"`
 }
 
 func (config APIConfig) BackendURL() string {
