@@ -24,15 +24,15 @@ RUN go mod download
 RUN <<EOF
   go install github.com/air-verse/air@latest
 
-  curl -LO https://github.com/sqldef/sqldef/releases/download/v0.17.11/psqldef_linux_amd64.tar.gz
+  curl -LO https://github.com/sqldef/sqldef/releases/download/v0.17.14/psqldef_linux_amd64.tar.gz
   tar xf psqldef_linux_amd64.tar.gz
   mv psqldef /usr/local/bin/
   rm psqldef_linux_amd64.tar.gz
 
-  curl -LO https://github.com/sqldef/sqldef/releases/download/v0.17.11/mysql_linux_amd64.tar.gz
+  curl -LO https://github.com/sqldef/sqldef/releases/download/v0.17.14/mysqldef_linux_amd64.tar.gz
   tar xf mysql_linux_amd64.tar.gz
-  mv mysql /usr/local/bin/
-  rm mysql_linux_amd64.tar.gz
+  mv mysqldef /usr/local/bin/
+  rm mysqldef_linux_amd64.tar.gz
 EOF
 
 ADD entrypoint.dev.sh /app/entrypoint.dev.sh
