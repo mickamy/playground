@@ -57,7 +57,7 @@ func (mr *MockUserAccountMockRecorder) Create(ctx, m any) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockUserAccount) Get(ctx context.Context, id model.UUID, scopes ...repository.Scope) (model.UserAccount, error) {
+func (m *MockUserAccount) Get(ctx context.Context, id string, scopes ...repository.Scope) (model.UserAccount, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, id}
 	for _, a := range scopes {

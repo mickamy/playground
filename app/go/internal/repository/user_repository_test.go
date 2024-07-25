@@ -47,7 +47,7 @@ func TestUser_Get(t *testing.T) {
 
 	// act
 	sut := repository.NewUser(db)
-	actual, err := sut.Get(ctx, expected.ID)
+	actual, err := sut.Get(ctx, expected.ID.String())
 
 	// assert
 	assert.NoError(t, err)
@@ -90,7 +90,7 @@ func TestUser_Delete(t *testing.T) {
 
 	// act
 	sut := repository.NewUser(db)
-	err := sut.Delete(ctx, user.ID)
+	err := sut.Delete(ctx, user.ID.String())
 	assert.NoError(t, err)
 
 	// assert

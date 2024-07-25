@@ -11,7 +11,7 @@ import (
 //go:generate mockgen -source=$GOFILE -destination=./mock/mock_$GOFILE -package=$GOPACKAGE
 type UserAccount interface {
 	Creator[model.UserAccount]
-	Reader[model.UserAccount, model.UUID]
+	Reader[model.UserAccount, string]
 	GetBySlug(ctx context.Context, slug string, scopes ...Scope) (model.UserAccount, error)
 	GetByIDToken(ctx context.Context, provider model.UserAccountProvider, uid string, scopes ...Scope) (model.UserAccount, error)
 	WithTx(tx *gorm.DB) UserAccount
@@ -29,9 +29,9 @@ func (repo userAccount) Create(ctx context.Context, m *model.UserAccount) error 
 	return repo.WithContext(ctx).Create(m).Error
 }
 
-func (repo userAccount) Get(ctx context.Context, userID model.UUID, scopes ...Scope) (model.UserAccount, error) {
+func (repo userAccount) Get(ctx context.Context, userID string, scopes ...Scope) (model.UserAccount, error) {
 	var account model.UserAccount
-	err := repo.WithContext(ctx).First(&account, "user_id = ?", userID).Error
+	err := repo.WithContext(ctx).First(&account, "user_id = ?", model.ParseUUID(userID)).Error
 	return account, err
 }
 

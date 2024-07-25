@@ -12,7 +12,7 @@ var (
 )
 
 type User struct {
-	ID        UUID `gorm:"primary_key;type:binary(16);default:UUID_TO_BIN(UUID())"`
+	ID        UUID
 	Slug      string
 	CreatedAt time.Time
 	UpdatedAt time.Time

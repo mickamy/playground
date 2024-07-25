@@ -20,11 +20,19 @@ CREATE TABLE user_accounts
     CONSTRAINT fk_user_accounts_user_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
-CREATE INDEX idx_user_accounts_on_user_id
-    ON user_accounts (user_id);
-
 CREATE UNIQUE INDEX idx_user_accounts_on_email
     ON user_accounts (email);
 
 CREATE UNIQUE INDEX idx_user_accounts_on_provider_and_uid
     ON user_accounts (provider, uid);
+
+
+CREATE TABLE user_profiles
+(
+    user_id    BINARY(16)                                                               NOT NULL PRIMARY KEY,
+    name       VARCHAR(50)                                                              NOT NULL,
+    bio        TEXT                                                                     NOT NULL,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)                                NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,
+    CONSTRAINT fk_user_profiles_user_id FOREIGN KEY (user_id) REFERENCES users (id)
+);

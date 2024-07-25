@@ -20,7 +20,7 @@ func TestUserAccount_Create(t *testing.T) {
 	ctx := context.Background()
 	user := fixture.User(func(user *model.User) {})
 	assert.NoError(t, repository.NewUser(db).Create(ctx, &user))
-	account := fixture.UserAccount(func(account *model.UserAccount) { account.UserID = user.ID })
+	account := fixture.UserAccount(func(m *model.UserAccount) { m.UserID = user.ID })
 
 	// act
 	sut := repository.NewUserAccount(db)
@@ -41,12 +41,12 @@ func TestUserAccount_Get(t *testing.T) {
 	ctx := context.Background()
 	user := fixture.User(nil)
 	assert.NoError(t, repository.NewUser(db).Create(ctx, &user))
-	expected := fixture.UserAccount(func(account *model.UserAccount) { account.UserID = user.ID })
+	expected := fixture.UserAccount(func(m *model.UserAccount) { m.UserID = user.ID })
 	assert.NoError(t, db.Save(&expected).Error)
 
 	// act
 	sut := repository.NewUserAccount(db)
-	actual, err := sut.Get(ctx, expected.UserID)
+	actual, err := sut.Get(ctx, expected.UserID.String())
 
 	// assert
 	assert.NoError(t, err)
@@ -61,8 +61,8 @@ func TestUserAccount_GetBySlug(t *testing.T) {
 	ctx := context.Background()
 	user := fixture.User(func(user *model.User) {})
 	assert.NoError(t, repository.NewUser(db).Create(ctx, &user))
-	expected := fixture.UserAccount(func(account *model.UserAccount) {
-		account.UserID = user.ID
+	expected := fixture.UserAccount(func(m *model.UserAccount) {
+		m.UserID = user.ID
 	})
 	assert.NoError(t, db.Save(&expected).Error)
 	expected.User = user
@@ -84,7 +84,7 @@ func TestUserAccount_GetByIDToken(t *testing.T) {
 	ctx := context.Background()
 	user := fixture.User(func(user *model.User) {})
 	assert.NoError(t, repository.NewUser(db).Create(ctx, &user))
-	expected := fixture.UserAccount(func(account *model.UserAccount) { account.UserID = user.ID })
+	expected := fixture.UserAccount(func(m *model.UserAccount) { m.UserID = user.ID })
 	assert.NoError(t, db.Save(&expected).Error)
 
 	// act
@@ -104,8 +104,8 @@ func TestUserAccount_UserAccountWithUser(t *testing.T) {
 	ctx := context.Background()
 	user := fixture.User(func(user *model.User) {})
 	assert.NoError(t, repository.NewUser(db).Create(ctx, &user))
-	expected := fixture.UserAccount(func(account *model.UserAccount) {
-		account.UserID = user.ID
+	expected := fixture.UserAccount(func(m *model.UserAccount) {
+		m.UserID = user.ID
 	})
 	assert.NoError(t, db.Save(&expected).Error)
 

@@ -6,7 +6,7 @@ import (
 	"mickamy.com/playground/internal/model"
 )
 
-func UserAccount(setter func(account *model.UserAccount)) model.UserAccount {
+func UserAccount(setter func(m *model.UserAccount)) model.UserAccount {
 	m := model.UserAccount{
 		Email:    gofakeit.Email(),
 		Provider: UserAccountProvider(),

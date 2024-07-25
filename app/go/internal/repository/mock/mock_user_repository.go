@@ -57,7 +57,7 @@ func (mr *MockUserMockRecorder) Create(ctx, m any) *gomock.Call {
 }
 
 // Delete mocks base method.
-func (m *MockUser) Delete(ctx context.Context, id model.UUID) error {
+func (m *MockUser) Delete(ctx context.Context, id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", ctx, id)
 	ret0, _ := ret[0].(error)
@@ -71,7 +71,7 @@ func (mr *MockUserMockRecorder) Delete(ctx, id any) *gomock.Call {
 }
 
 // Get mocks base method.
-func (m *MockUser) Get(ctx context.Context, id model.UUID, scopes ...repository.Scope) (model.User, error) {
+func (m *MockUser) Get(ctx context.Context, id string, scopes ...repository.Scope) (model.User, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, id}
 	for _, a := range scopes {

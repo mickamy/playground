@@ -6,7 +6,7 @@ import (
 	"mickamy.com/playground/internal/model"
 )
 
-func User(setter func(*model.User)) model.User {
+func User(setter func(m *model.User)) model.User {
 	m := model.User{
 		Slug: gofakeit.Name(),
 	}
