@@ -18,6 +18,7 @@ type UserSignUpInput struct {
 }
 type UserSignUpOutput struct {
 	Account model.UserAccount
+	Profile model.UserProfile
 	Tokens  jwt.AccessAndRefresh
 }
 
@@ -31,6 +32,7 @@ type userSignUp struct {
 	oauth       oauth.OAuth
 	userRepo    repository.User
 	accountRepo repository.UserAccount
+	profileRepo repository.UserProfile
 }
 
 func NewUserSignUp(
@@ -38,12 +40,14 @@ func NewUserSignUp(
 	oauth oauth.OAuth,
 	userRepo repository.User,
 	accountRepo repository.UserAccount,
+	profileRepo repository.UserProfile,
 ) UserSignUp {
 	return userSignUp{
 		db:          db,
 		oauth:       oauth,
 		userRepo:    userRepo,
 		accountRepo: accountRepo,
+		profileRepo: profileRepo,
 	}
 }
 
@@ -60,14 +64,20 @@ func (uc userSignUp) Do(ctx context.Context, input UserSignUpInput) (UserSignUpO
 			return errors.Wrap(err, "failed to create user")
 		}
 		output.Account = model.UserAccount{
+			UserID:   user.ID,
 			Email:    payload.Email,
 			Provider: model.UserAccountProvider(payload.Provider),
 			UID:      payload.UID,
-			UserID:   user.ID,
 		}
-		err := uc.accountRepo.WithTx(tx).Create(ctx, &output.Account)
-		if err != nil {
+		if err := uc.accountRepo.WithTx(tx).Create(ctx, &output.Account); err != nil {
 			return errors.Wrap(err, "failed to create account")
+		}
+		output.Profile = model.UserProfile{
+			UserID: user.ID,
+			Name:   payload.Name,
+		}
+		if err := uc.profileRepo.WithTx(tx).Create(ctx, &output.Profile); err != nil {
+			return errors.Wrap(err, "failed to create profile")
 		}
 
 		output.Tokens, err = jwt.New(user.ID.String())
