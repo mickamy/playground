@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/testcontainers/testcontainers-go"
@@ -44,7 +45,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 	cfg := config.DB()
 	ctn, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
-			Name:         t.Name(),
+			Name:         gofakeit.UUID(),
 			Image:        "mysql:8.0.36",
 			ExposedPorts: []string{"3306/tcp"},
 			Env: map[string]string{
