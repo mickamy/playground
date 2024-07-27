@@ -13,17 +13,17 @@ import (
 	"mickamy.com/playground/internal/usecase"
 )
 
-type UserController struct {
+type User struct {
 	signUpUseCase usecase.UserSignUp
 }
 
-func NewUser(signUpUseCase usecase.UserSignUp) UserController {
-	return UserController{
+func NewUser(signUpUseCase usecase.UserSignUp) User {
+	return User{
 		signUpUseCase: signUpUseCase,
 	}
 }
 
-func (ctrl UserController) SignUp(c echo.Context) error {
+func (ctrl User) SignUp(c echo.Context) error {
 	var in input.UserSignUp
 	if err := c.Bind(&in); err != nil {
 		return c.JSON(http.StatusBadRequest, output.NewErrorMessage(err))

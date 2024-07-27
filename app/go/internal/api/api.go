@@ -12,6 +12,7 @@ import (
 
 	"mickamy.com/playground/config"
 	"mickamy.com/playground/internal/api/router"
+	"mickamy.com/playground/internal/di"
 	"mickamy.com/playground/internal/infra/store/database"
 )
 
@@ -25,8 +26,8 @@ func Run() {
 
 	e.Use(middleware.Recover())
 
-	db := db()
-	router.User(e, db)
+	controllers := di.InitializeControllers()
+	router.User(e, controllers.User)
 
 	printRoutes(e)
 

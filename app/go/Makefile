@@ -4,6 +4,7 @@
 	down \
 	test \
 	db-migrate \
+	wire \
 
 build:
 	cd ../../ && make build && cd -
@@ -22,3 +23,6 @@ test: db-migrate
 
 db-migrate:
 	mysqldef -u $$DB_USER -p$$DB_PASSWORD -h $$DB_HOST -P $$DB_PORT $$DB_NAME < ./db/schema.sql
+
+wire:
+	cd ./internal/di && wire && cd -

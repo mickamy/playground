@@ -33,6 +33,9 @@ RUN apt-get update
 RUN apt-get install -y docker.io
 RUN rm -rf /var/lib/apt/lists/*
 
+RUN go install github.com/air-verse/air@latest
+RUN go install github.com/google/wire/cmd/wire@latest
+
 WORKDIR /app
 
 COPY go.mod go.sum cmd/api/main.go ./
