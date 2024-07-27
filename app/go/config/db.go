@@ -7,11 +7,11 @@ import (
 )
 
 type DBConfig struct {
-	User     string `env:"DB_USER" envDefault:"playground"`
-	Password string `env:"DB_PASSWORD" envDefault:"password"`
-	Host     string `env:"DB_HOST" envDefault:"localhost"`
-	Port     int    `env:"DB_PORT" envDefault:"3306"`
-	Name     string `env:"DB_NAME" envDefault:"playground"`
+	User     string `env:"DB_USER"`
+	Password string `env:"DB_PASSWORD"`
+	Host     string `env:"DB_HOST"`
+	Port     int    `env:"DB_PORT"`
+	Name     string `env:"DB_NAME"`
 }
 
 var db = DBConfig{}

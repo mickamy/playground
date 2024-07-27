@@ -1,6 +1,8 @@
 package database
 
 import (
+	"sync"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -8,11 +10,16 @@ import (
 	"mickamy.com/playground/config"
 )
 
-var db *gorm.DB
+var (
+	once sync.Once
+	db   *gorm.DB
+)
 
 func DB(cfg config.DBConfig) *gorm.DB {
 	if db == nil {
-		initializeDB(cfg)
+		once.Do(func() {
+			initializeDB(cfg)
+		})
 	}
 	return db
 }

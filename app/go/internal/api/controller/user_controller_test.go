@@ -35,7 +35,6 @@ func TestUser_SignUp_Unit(t *testing.T) {
 	assert.NoError(t, err)
 	res := usecase.UserSignUpOutput{
 		Account: fixture.UserAccount(nil),
-		Profile: fixture.UserProfile(nil),
 		Tokens:  tokens,
 	}
 	ctrl := gomock.NewController(t)

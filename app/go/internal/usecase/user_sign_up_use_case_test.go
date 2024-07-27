@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
+	"mickamy.com/playground/config"
 	oauthMock "mickamy.com/playground/internal/lib/oauth/mock"
 	"mickamy.com/playground/internal/model"
 	repoMock "mickamy.com/playground/internal/repository/mock"
@@ -26,12 +27,14 @@ func TestUserSignUp_Do(t *testing.T) {
 	userRepo := repoMock.NewMockUser(controller)
 	accountRepo := repoMock.NewMockUserAccount(controller)
 	profileRepo := repoMock.NewMockUserProfile(controller)
+	avatarRepo := repoMock.NewMockUserAvatar(controller)
 	uc := usecase.NewUserSignUp(
 		db,
 		oauthInstance,
 		userRepo,
 		accountRepo,
 		profileRepo,
+		avatarRepo,
 	)
 
 	provider := model.UserAccountProviderGoogle.String()
@@ -52,6 +55,10 @@ func TestUserSignUp_Do(t *testing.T) {
 		UserID: userID,
 		Name:   payload.Name,
 	}
+	avatar := model.UserAvatar{
+		UserID: userID,
+		Bucket: config.AWS().S3Bucket,
+	}
 
 	// mock
 	oauthInstance.EXPECT().ValidateToken(gomock.Any(), gomock.Eq(provider), gomock.Eq(idToken)).Return(payload, nil)
@@ -61,6 +68,8 @@ func TestUserSignUp_Do(t *testing.T) {
 	accountRepo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil).SetArg(1, account)
 	profileRepo.EXPECT().WithTx(gomock.Any()).Return(profileRepo)
 	profileRepo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil).SetArg(1, profile)
+	avatarRepo.EXPECT().WithTx(gomock.Any()).Return(avatarRepo)
+	avatarRepo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil).SetArg(1, avatar)
 
 	// act
 	output, err := uc.Do(context.Background(), usecase.UserSignUpInput{
@@ -75,7 +84,5 @@ func TestUserSignUp_Do(t *testing.T) {
 	assert.Equal(t, payload.Email, output.Account.Email)
 	assert.Equal(t, payload.Provider, output.Account.Provider.String())
 	assert.Equal(t, payload.UID, output.Account.UID)
-	assert.NotEmpty(t, output.Profile)
-	assert.Equal(t, payload.Name, output.Profile.Name)
 	assert.NotEmpty(t, output.Tokens)
 }

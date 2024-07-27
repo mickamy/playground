@@ -36,3 +36,13 @@ CREATE TABLE user_profiles
     updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,
     CONSTRAINT fk_user_profiles_user_id FOREIGN KEY (user_id) REFERENCES users (id)
 );
+
+CREATE TABLE user_avatars
+(
+    user_id    BINARY(16)                                                               NOT NULL,
+    bucket     varchar(50)                                                              NOT NULL,
+    created_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6)                                NOT NULL,
+    updated_at TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,
+    PRIMARY KEY (user_id, bucket),
+    CONSTRAINT fk_user_avatars_user_id FOREIGN KEY (user_id) REFERENCES users (id)
+)

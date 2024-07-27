@@ -59,6 +59,29 @@ func TestUserProfile_Get(t *testing.T) {
 	assert.Equal(t, profile.Bio, actual.Bio)
 }
 
+func TestUserProfile_Get_WithUser(t *testing.T) {
+	t.Parallel()
+
+	// arrange
+	db := test.NewTestDB(t)
+	ctx := context.Background()
+	user := fixture.User(nil)
+	assert.NoError(t, db.WithContext(ctx).Create(&user).Error)
+	profile := fixture.UserProfile(func(m *model.UserProfile) {
+		m.UserID = user.ID
+	})
+	assert.NoError(t, db.WithContext(ctx).Create(&profile).Error)
+
+	// act
+	sut := repository.NewUserProfile(db)
+	actual, err := sut.Get(ctx, user.ID.String(), repository.UserAccountWithUser)
+
+	// assert
+	assert.NoError(t, err)
+	profile.User = user
+	assert.Equal(t, profile, actual)
+}
+
 func TestUserProfile_GetBySlug(t *testing.T) {
 	t.Parallel()
 

@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
+	"mickamy.com/playground/config"
 	"mickamy.com/playground/internal/lib/jwt"
 	"mickamy.com/playground/internal/lib/oauth"
 	"mickamy.com/playground/internal/model"
@@ -18,7 +19,6 @@ type UserSignUpInput struct {
 }
 type UserSignUpOutput struct {
 	Account model.UserAccount
-	Profile model.UserProfile
 	Tokens  jwt.AccessAndRefresh
 }
 
@@ -33,6 +33,7 @@ type userSignUp struct {
 	userRepo    repository.User
 	accountRepo repository.UserAccount
 	profileRepo repository.UserProfile
+	avatarRepo  repository.UserAvatar
 }
 
 func NewUserSignUp(
@@ -41,6 +42,7 @@ func NewUserSignUp(
 	userRepo repository.User,
 	accountRepo repository.UserAccount,
 	profileRepo repository.UserProfile,
+	avatarRepo repository.UserAvatar,
 ) UserSignUp {
 	return userSignUp{
 		db:          db,
@@ -48,6 +50,7 @@ func NewUserSignUp(
 		userRepo:    userRepo,
 		accountRepo: accountRepo,
 		profileRepo: profileRepo,
+		avatarRepo:  avatarRepo,
 	}
 }
 
@@ -72,12 +75,21 @@ func (uc userSignUp) Do(ctx context.Context, input UserSignUpInput) (UserSignUpO
 		if err := uc.accountRepo.WithTx(tx).Create(ctx, &output.Account); err != nil {
 			return errors.Wrap(err, "failed to create account")
 		}
-		output.Profile = model.UserProfile{
+		profile := model.UserProfile{
 			UserID: user.ID,
 			Name:   payload.Name,
 		}
-		if err := uc.profileRepo.WithTx(tx).Create(ctx, &output.Profile); err != nil {
+		if err := uc.profileRepo.WithTx(tx).Create(ctx, &profile); err != nil {
 			return errors.Wrap(err, "failed to create profile")
+		}
+		if payload.Picture != "" {
+			avatar := model.UserAvatar{
+				UserID: user.ID,
+				Bucket: config.AWS().S3Bucket,
+			}
+			if err := uc.avatarRepo.WithTx(tx).Create(ctx, &avatar); err != nil {
+				return errors.Wrap(err, "failed to create avatar")
+			}
 		}
 
 		output.Tokens, err = jwt.New(user.ID.String())

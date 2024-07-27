@@ -30,7 +30,7 @@ func (repo userProfile) Create(ctx context.Context, m *model.UserProfile) error 
 
 func (repo userProfile) Get(ctx context.Context, userID string, scopes ...Scope) (model.UserProfile, error) {
 	var m model.UserProfile
-	err := repo.WithContext(ctx).Scopes(scopes...).First(&m, "user_id = ?", model.ParseUUID(userID)).Error
+	err := repo.WithContext(ctx).Scopes(scopes...).First(&m, "`user_profiles`.user_id = ?", model.ParseUUID(userID)).Error
 	return m, err
 }
 

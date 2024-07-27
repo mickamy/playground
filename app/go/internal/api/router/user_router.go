@@ -15,7 +15,8 @@ func User(e *echo.Echo, db *gorm.DB) {
 	userRepo := repository.NewUser(db)
 	accountRepo := repository.NewUserAccount(db)
 	profileRepo := repository.NewUserProfile(db)
-	signUpUseCase := usecase.NewUserSignUp(db, auth, userRepo, accountRepo, profileRepo)
+	avatarRepo := repository.NewUserAvatar(db)
+	signUpUseCase := usecase.NewUserSignUp(db, auth, userRepo, accountRepo, profileRepo, avatarRepo)
 	ctrl := controller.NewUser(
 		signUpUseCase,
 	)

@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,9 +16,10 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 
 	"mickamy.com/playground/config"
+	"mickamy.com/playground/internal/lib/logger"
 )
 
 const (
@@ -68,6 +70,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 		},
 		Started: true,
 		Reuse:   reuseContainer,
+		Logger:  logger.NewLogger(slog.LevelInfo),
 	})
 	if err != nil {
 		t.Fatalf("Could not start mysql: %s", err)
@@ -90,7 +93,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local", cfg.User, cfg.Password, host, port.Int(), cfg.Name)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: gormLogger.Default.LogMode(gormLogger.Info),
 	})
 	if err != nil {
 		t.Fatalf("Could not connect to database: %s", err)
@@ -101,7 +104,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 
 func initActualDB(t *testing.T) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(config.DB().DatabaseURL()), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Warn),
+		Logger: gormLogger.Default.LogMode(gormLogger.Warn),
 	})
 	if err != nil {
 		panic(err)

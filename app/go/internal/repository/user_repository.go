@@ -31,9 +31,9 @@ func (repo user) Create(ctx context.Context, m *model.User) error {
 }
 
 func (repo user) Get(ctx context.Context, id string, scopes ...Scope) (model.User, error) {
-	var user model.User
-	err := repo.WithContext(ctx).Scopes(scopes...).First(&user, "id = ?", model.ParseUUID(id)).Error
-	return user, err
+	var m model.User
+	err := repo.WithContext(ctx).Scopes(scopes...).First(&m, "id = ?", model.ParseUUID(id)).Error
+	return m, err
 }
 
 func (repo user) Update(ctx context.Context, m model.User) error {
