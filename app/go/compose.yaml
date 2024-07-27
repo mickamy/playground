@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      args:
+        GO_VERSION: 1.22.5
+        target: dev
+    env_file:
+      - .env.common
+      - .env.docker
+    environment:
+      ENV: test
+      EDITOR: vim
+      HISTFILE: /usr/local/hist/.bash_history
+    stdin_open: true
+    tty: true
+    volumes:
+      - history:/usr/local/hist
+      - ../../.bashrc:/root/.bashrc:ro
+      - go:/go
+      - .:/app:cached
+    restart: on-failure
+    ports:
+      - 3000:3000
+    networks:
+      - playground_network
+
+networks:
+  playground_network:
+    external: true
+
+volumes:
+  history:
+  go:
