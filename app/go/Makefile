@@ -24,5 +24,14 @@ test: db-migrate
 db-migrate:
 	mysqldef -u $$DB_USER -p$$DB_PASSWORD -h $$DB_HOST -P $$DB_PORT $$DB_NAME < ./db/schema.sql
 
+proto:
+	protoc \
+		--proto_path=../../proto \
+		--go_out=./internal/api/pb \
+		--go_opt=paths=source_relative \
+		--go-grpc_out=./internal/api/pb \
+		--go-grpc_opt=paths=source_relative,require_unimplemented_servers=false \
+		$$(find ../../proto -name "*.proto")
+
 wire:
 	cd ./internal/di && wire && cd -
