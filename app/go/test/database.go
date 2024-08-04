@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -40,11 +39,7 @@ func NewTestDB(t *testing.T) *gorm.DB {
 func initTestContainers(t *testing.T) *gorm.DB {
 	ctx := context.Background()
 
-	packageRoot, ok := os.LookupEnv("PACKAGE_ROOT")
-	if !ok {
-		t.Fatal("PACKAGE_ROOT environment variable not set")
-	}
-	cfg := config.DB()
+	packageRoot := config.Common().PackageRoot
 	ctn, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: testcontainers.ContainerRequest{
 			Name:         uuid.NewString(),
@@ -52,9 +47,9 @@ func initTestContainers(t *testing.T) *gorm.DB {
 			ExposedPorts: []string{"3306/tcp"},
 			Env: map[string]string{
 				"MYSQL_ROOT_PASSWORD": "root",
-				"MYSQL_USER":          cfg.User,
-				"MYSQL_PASSWORD":      cfg.Password,
-				"MYSQL_DATABASE":      cfg.Name,
+				"MYSQL_USER":          "user",
+				"MYSQL_PASSWORD":      "pass",
+				"MYSQL_DATABASE":      "playground",
 			},
 			HostConfigModifier: func(hostConfig *container.HostConfig) {
 				hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
@@ -91,7 +86,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 		}
 	})
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local", cfg.User, cfg.Password, host, port.Int(), cfg.Name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local", "user", "pass", host, port.Int(), "playground")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: gormLogger.Default.LogMode(gormLogger.Info),
 	})

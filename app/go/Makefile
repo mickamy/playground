@@ -3,8 +3,11 @@
 	up \
 	down \
 	test \
+	db-create \
+	db-drop \
 	db-migrate \
 	db-migrate-dry \
+	db-reset \
 	wire \
 
 build:
@@ -19,14 +22,20 @@ down:
 	cd ../../ && make down
 	docker compose down
 
-test: db-migrate
+test:
 	go test ./...
 
-db-migrate:
-	mysqldef -u $$DB_USER -p$$DB_PASSWORD -h $$DB_HOST -P $$DB_PORT $$DB_NAME < ./db/schema.sql
+db-create:
+	go run ./cmd/db/create/main.go
 
-db-migrate-dry:
-	mysqldef -u $$DB_USER -p$$DB_PASSWORD -h $$DB_HOST -P $$DB_PORT $$DB_NAME --dry-run < ./db/schema.sql
+db-drop:
+	go run ./cmd/db/drop/main.go
+
+db-migrate:
+	go run ./cmd/db/migrate/main.go
+
+db-reset:
+	go run ./cmd/db/reset/main.go
 
 wire:
 	cd ./internal/di && wire

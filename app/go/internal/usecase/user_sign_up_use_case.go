@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"mickamy.com/playground/config"
@@ -64,7 +64,7 @@ func (uc userSignUp) Do(ctx context.Context, input UserSignUpInput) (UserSignUpO
 	err = uc.db.Transaction(func(tx *gorm.DB) error {
 		user := model.User{}
 		if err := uc.userRepo.WithTx(tx).Create(ctx, &user); err != nil {
-			return errors.Wrap(err, "failed to create user")
+			return fmt.Errorf("failed to create user: %w", err)
 		}
 		output.Account = model.UserAccount{
 			UserID:   user.ID,
@@ -73,14 +73,14 @@ func (uc userSignUp) Do(ctx context.Context, input UserSignUpInput) (UserSignUpO
 			UID:      payload.UID,
 		}
 		if err := uc.accountRepo.WithTx(tx).Create(ctx, &output.Account); err != nil {
-			return errors.Wrap(err, "failed to create account")
+			return fmt.Errorf("failed to create account: %w", err)
 		}
 		profile := model.UserProfile{
 			UserID: user.ID,
 			Name:   payload.Name,
 		}
 		if err := uc.profileRepo.WithTx(tx).Create(ctx, &profile); err != nil {
-			return errors.Wrap(err, "failed to create profile")
+			return fmt.Errorf("failed to create profile: %w", err)
 		}
 		if payload.Picture != "" {
 			avatar := model.UserAvatar{
@@ -88,13 +88,13 @@ func (uc userSignUp) Do(ctx context.Context, input UserSignUpInput) (UserSignUpO
 				Bucket: config.AWS().S3Bucket,
 			}
 			if err := uc.avatarRepo.WithTx(tx).Create(ctx, &avatar); err != nil {
-				return errors.Wrap(err, "failed to create avatar")
+				return fmt.Errorf("failed to create avatar: %w", err)
 			}
 		}
 
 		output.Tokens, err = jwt.New(user.ID.String())
 		if err != nil {
-			return errors.Wrap(err, "failed to create JWT")
+			return fmt.Errorf("failed to create JWT: %w", err)
 		}
 		return nil
 	})
