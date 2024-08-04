@@ -4,6 +4,7 @@
 	down \
 	test \
 	db-migrate \
+	db-migrate-dry \
 	wire \
 
 build:
@@ -23,6 +24,9 @@ test: db-migrate
 
 db-migrate:
 	mysqldef -u $$DB_USER -p$$DB_PASSWORD -h $$DB_HOST -P $$DB_PORT $$DB_NAME < ./db/schema.sql
+
+db-migrate-dry:
+	mysqldef -u $$DB_USER -p$$DB_PASSWORD -h $$DB_HOST -P $$DB_PORT $$DB_NAME --dry-run < ./db/schema.sql
 
 wire:
 	cd ./internal/di && wire

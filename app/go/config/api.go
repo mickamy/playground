@@ -5,7 +5,7 @@ import (
 )
 
 type APIConfig struct {
-	Port         int    `env:"PORT" envDefault:"3000"`
+	Port         int    `env:"PORT"`
 	BackendHost  string `env:"BACKEND_HOST"`
 	FrontendHost string `env:"FRONTEND_HOST"`
 }

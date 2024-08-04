@@ -26,7 +26,6 @@ CREATE UNIQUE INDEX idx_user_accounts_on_email
 CREATE UNIQUE INDEX idx_user_accounts_on_provider_and_uid
     ON user_accounts (provider, uid);
 
-
 CREATE TABLE user_profiles
 (
     user_id    BINARY(16)                                                               NOT NULL PRIMARY KEY,

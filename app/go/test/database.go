@@ -103,7 +103,7 @@ func initTestContainers(t *testing.T) *gorm.DB {
 }
 
 func initActualDB(t *testing.T) *gorm.DB {
-	db, err := gorm.Open(mysql.Open(config.DB().DatabaseURL()), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(config.DB().URL), &gorm.Config{
 		Logger: gormLogger.Default.LogMode(gormLogger.Warn),
 	})
 	if err != nil {

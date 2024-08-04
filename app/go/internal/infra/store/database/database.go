@@ -26,7 +26,7 @@ func DB(cfg config.DBConfig) *gorm.DB {
 
 func initializeDB(cfg config.DBConfig) {
 	var err error
-	db, err = gorm.Open(mysql.Open(cfg.DatabaseURL()), &gorm.Config{
+	db, err = gorm.Open(mysql.Open(cfg.URL), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Warn),
 	})
 	if err != nil {
