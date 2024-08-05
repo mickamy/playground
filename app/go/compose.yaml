@@ -19,6 +19,7 @@ services:
       - go:/go
       - .:/app:cached
     restart: on-failure
+    command: /bin/bash -c "air"
     ports:
       - 3000:3000
     networks:
