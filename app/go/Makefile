@@ -14,7 +14,7 @@ build:
 	cd ../../ && make build
 	docker compose build
 
-up:
+up: down
 	cd ../../ && make down && make up-d
 	docker compose up
 
