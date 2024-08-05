@@ -5,7 +5,6 @@ services:
         GO_VERSION: 1.22.5
         target: dev
     env_file:
-      - .env.common
       - .env.docker
     environment:
       ENV: test
